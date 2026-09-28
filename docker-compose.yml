@@ -1,0 +1,33 @@
+# Levanta la solución completa: docker compose up --build
+# Aplicación: http://localhost:8080 (usuario: admin, contraseña: Admin123*)
+
+services:
+  api:
+    build: ./backend
+    # Configuración de ASP.NET Core por variables de entorno ("__" equivale a ":" en
+    # appsettings.json). ${VAR:-valor} toma la variable de la terminal si existe y, si no,
+    # el valor local: basta con "docker compose up --build". En producción se definen
+    # JWT_SECRET y DEFAULT_USER_PASSWORD en el servidor o en el pipeline.
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      # Las migraciones se aplican al iniciar y crean la base si no existe.
+      ConnectionStrings__DefaultConnection: Data Source=/app/data/creditos.db
+      Jwt__Secret: ${JWT_SECRET:-local-docker-secret-5f1c9a7e3b2d4f6a8c0e2b4d6f8a0c2e}
+      DefaultUser__UserName: ${DEFAULT_USER_NAME:-admin}
+      DefaultUser__Password: ${DEFAULT_USER_PASSWORD:-Admin123*}
+    volumes:
+      # Archivo SQLite persistido en un volumen local de Docker (sobrevive a reinicios y
+      # reconstrucciones; "docker compose down -v" lo borra).
+      - creditos-data:/app/data
+    restart: unless-stopped
+
+  web:
+    build: ./frontend/creditos-web
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  creditos-data:
