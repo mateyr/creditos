@@ -1,4 +1,3 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 import {
@@ -11,11 +10,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import {
-  clientesKeys,
-  eliminarCliente,
-  type Cliente,
-} from "@/features/clientes/api"
+import { useEliminarCliente } from "@/features/clientes/api/eliminar-cliente"
+import type { Cliente } from "@/features/clientes/types"
 import { getErrorMessage } from "@/lib/api-client"
 
 type EliminarClienteDialogProps = {
@@ -28,19 +24,14 @@ export function EliminarClienteDialog({
   cliente,
   onClose,
 }: EliminarClienteDialogProps) {
-  const queryClient = useQueryClient()
-
-  const eliminarMutation = useMutation({
-    mutationFn: eliminarCliente,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        // Invalida todas las páginas y búsquedas de la lista.
-        queryKey: clientesKeys.all,
-      })
-      toast.success("Cliente eliminado.")
-      onClose()
+  const eliminarMutation = useEliminarCliente({
+    mutationConfig: {
+      onSuccess: () => {
+        toast.success("Cliente eliminado.")
+        onClose()
+      },
+      onError: (error) => toast.error(getErrorMessage(error)),
     },
-    onError: (error) => toast.error(getErrorMessage(error)),
   })
 
   return (

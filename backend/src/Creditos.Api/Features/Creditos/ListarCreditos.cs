@@ -1,7 +1,7 @@
 using Creditos.Api.Common.Endpoints;
 using Creditos.Api.Common.Pagination;
 using Creditos.Api.Database;
-using Creditos.Domain.Clientes;
+using Creditos.Domain.Creditos;
 using Creditos.Domain.Solicitudes;
 
 using FluentValidation;
@@ -10,25 +10,24 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
-namespace Creditos.Api.Features.Solicitudes;
+namespace Creditos.Api.Features.Creditos;
 
-public static class ListarSolicitudes
+public static class ListarCreditos
 {
-    public sealed record Request(
-        int Page = 1,
-        int PageSize = 10,
-        string? Search = null,
-        EstadoSolicitud? Estado = null);
+    public sealed record Request(int Page = 1, int PageSize = 10, string? Search = null);
 
     public sealed record Response(
         int Id,
+        string NumeroCredito,
+        int SolicitudId,
         string Cedula,
         string NombreCompleto,
-        int Edad,
-        decimal MontoSolicitado,
+        decimal Monto,
+        decimal TasaInteresAnual,
         int CantidadCuotas,
         Periodicidad Periodicidad,
         decimal PlazoMeses,
+        decimal CuotaNivelada,
         EstadoSolicitud Estado,
         DateTime FechaCreacion);
 
@@ -39,7 +38,6 @@ public static class ListarSolicitudes
             RuleFor(r => r.Page).GreaterThanOrEqualTo(1).WithName("Página");
             RuleFor(r => r.PageSize).InclusiveBetween(1, 100).WithName("Tamaño de página");
             RuleFor(r => r.Search).MaximumLength(150).WithName("Búsqueda");
-            RuleFor(r => r.Estado).IsInEnum().WithMessage("El estado no es válido.");
         }
     }
 
@@ -47,8 +45,8 @@ public static class ListarSolicitudes
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
-            app.MapGet("solicitudes", Handle)
-                .WithTags(Tags.Solicitudes)
+            app.MapGet("creditos", Handle)
+                .WithTags(Tags.Creditos)
                 .RequireAuthorization();
         }
 
@@ -56,7 +54,6 @@ public static class ListarSolicitudes
             [AsParameters] Request request,
             IValidator<Request> validator,
             CreditosContext context,
-            TimeProvider timeProvider,
             CancellationToken cancellationToken)
         {
             ValidationResult validationResult = await validator.ValidateAsync(request, cancellationToken);
@@ -66,43 +63,39 @@ public static class ListarSolicitudes
                 return TypedResults.ValidationProblem(validationResult.ToDictionary());
             }
 
-            IQueryable<SolicitudCredito> query = context.Solicitudes.AsNoTracking();
-
-            if (request.Estado is not null)
-            {
-                query = query.Where(s => s.Estado == request.Estado);
-            }
+            IQueryable<Credito> query = context.Creditos.AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(request.Search))
             {
                 string patron = $"%{request.Search.Trim()}%";
 
-                query = query.Where(s =>
-                    EF.Functions.Like(s.Cliente.Cedula, patron) ||
-                    EF.Functions.Like(s.Cliente.NombreCompleto, patron));
+                query = query.Where(c =>
+                    EF.Functions.Like(c.NumeroCredito, patron) ||
+                    EF.Functions.Like(c.Solicitud.Cliente.Cedula, patron) ||
+                    EF.Functions.Like(c.Solicitud.Cliente.NombreCompleto, patron));
             }
 
-            // Se cargan las entidades de la página para reutilizar las reglas del dominio
-            // (edad y plazo) en lugar de repetir los cálculos en la consulta.
-            PagedResponse<SolicitudCredito> page = await query
-                .Include(s => s.Cliente)
-                .OrderByDescending(s => s.FechaCreacion)
-                .ThenByDescending(s => s.Id)
+            // Se cargan las entidades de la página para reutilizar el plazo calculado en el dominio.
+            PagedResponse<Credito> page = await query
+                .Include(c => c.Solicitud)
+                    .ThenInclude(s => s.Cliente)
+                .OrderByDescending(c => c.Id)
                 .ToPagedResponseAsync(request.Page, request.PageSize, cancellationToken);
 
-            DateOnly hoy = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
-
-            return TypedResults.Ok(page.Map(s => new Response(
-                s.Id,
-                s.Cliente.Cedula,
-                s.Cliente.NombreCompleto,
-                CalculadoraEdad.Calcular(s.Cliente.FechaNacimiento, hoy),
-                s.MontoSolicitado,
-                s.CantidadCuotas,
-                s.Periodicidad,
-                s.PlazoMeses,
-                s.Estado,
-                s.FechaCreacion)));
+            return TypedResults.Ok(page.Map(c => new Response(
+                c.Id,
+                c.NumeroCredito,
+                c.SolicitudId,
+                c.Solicitud.Cliente.Cedula,
+                c.Solicitud.Cliente.NombreCompleto,
+                c.Solicitud.MontoSolicitado,
+                c.Solicitud.TasaInteresAnual,
+                c.Solicitud.CantidadCuotas,
+                c.Solicitud.Periodicidad,
+                c.Solicitud.PlazoMeses,
+                c.Solicitud.CuotaNivelada,
+                c.Solicitud.Estado,
+                c.FechaCreacion)));
         }
     }
 }

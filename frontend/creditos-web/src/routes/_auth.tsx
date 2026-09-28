@@ -5,10 +5,10 @@ import {
   redirect,
 } from "@tanstack/react-router"
 
-import { AppSidebar } from "@/components/app-sidebar"
-import { SiteHeader } from "@/components/site-header"
+import { AppSidebar } from "@/components/layout/app-sidebar"
+import { SiteHeader } from "@/components/layout/site-header"
+import { session, useSession } from "@/lib/session"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { session, useSession } from "@/features/auth/session"
 
 export const Route = createFileRoute("/_auth")({
   // Sin sesión no se entra a ninguna ruta hija; se guarda el destino para volver tras el login.

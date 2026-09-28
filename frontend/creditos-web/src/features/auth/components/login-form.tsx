@@ -1,5 +1,4 @@
 import { useForm } from "@tanstack/react-form"
-import { useMutation } from "@tanstack/react-query"
 import { cn } from "cn"
 import { EyeIcon, EyeOffIcon, HandCoinsIcon } from "lucide-react"
 import * as React from "react"
@@ -25,8 +24,8 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import { login, loginSchema, type LoginRequest } from "@/features/auth/api"
-import { session } from "@/features/auth/session"
+import { useLogin } from "@/features/auth/api/login"
+import { loginSchema, type LoginRequest } from "@/features/auth/schemas"
 import { getErrorMessage } from "@/lib/api-client"
 
 const defaultValues: LoginRequest = { userName: "", password: "" }
@@ -38,13 +37,7 @@ export function LoginForm({
 }: React.ComponentProps<"div"> & { onSuccess: () => void }) {
   const [showPassword, setShowPassword] = React.useState(false)
 
-  const loginMutation = useMutation({
-    mutationFn: login,
-    onSuccess: ({ accessToken }) => {
-      session.start(accessToken)
-      onSuccess()
-    },
-  })
+  const loginMutation = useLogin({ onSuccess })
 
   const form = useForm({
     defaultValues,

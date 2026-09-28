@@ -1,37 +1,27 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router"
 import { PlusIcon } from "lucide-react"
-import { useCallback, useEffect, useState } from "react"
-import { z } from "zod"
+import { useCallback, useState } from "react"
 
+import { PageHeader } from "@/components/page-header"
 import { SearchInput } from "@/components/search-input"
 import { Button } from "@/components/ui/button"
-import { clientesQueryOptions, type Cliente } from "@/features/clientes/api"
-import { ClienteFormDialog } from "@/features/clientes/cliente-form-dialog"
-import { ClientesTable } from "@/features/clientes/clientes-table"
-import { EliminarClienteDialog } from "@/features/clientes/eliminar-cliente-dialog"
-import { DEFAULT_PAGE_SIZE } from "@/lib/pagination"
-
-const searchDefaults = { page: 1, search: "" }
-
-const clientesSearchSchema = z.object({
-  page: z
-    .number()
-    .int()
-    .min(1)
-    .default(searchDefaults.page)
-    .catch(searchDefaults.page),
-  search: z
-    .string()
-    .max(150)
-    .default(searchDefaults.search)
-    .catch(searchDefaults.search),
-})
+import { clientesQueryOptions } from "@/features/clientes/api/get-clientes"
+import type { Cliente } from "@/features/clientes/types"
+import { ClienteFormDialog } from "@/features/clientes/components/cliente-form-dialog"
+import { ClientesTable } from "@/features/clientes/components/clientes-table"
+import { EliminarClienteDialog } from "@/features/clientes/components/eliminar-cliente-dialog"
+import { usePageInRange } from "@/hooks/use-page-in-range"
+import {
+  DEFAULT_PAGE_SIZE,
+  paginationSearchDefaults,
+  paginationSearchSchema,
+} from "@/lib/pagination"
 
 export const Route = createFileRoute("/_auth/clientes")({
   // La página y la búsqueda viven en la URL: se pueden compartir y el botón atrás funciona.
-  validateSearch: clientesSearchSchema,
-  search: { middlewares: [stripSearchParams(searchDefaults)] },
+  validateSearch: paginationSearchSchema,
+  search: { middlewares: [stripSearchParams(paginationSearchDefaults)] },
   loaderDeps: ({ search }) => search,
   loader: ({ context, deps }) =>
     context.queryClient.ensureQueryData(
@@ -56,31 +46,25 @@ function ClientesPage() {
     (cliente: Cliente) => setFormulario({ open: true, cliente }),
     []
   )
+  const irAPagina = useCallback(
+    (nextPage: number) =>
+      void navigate({ search: (prev) => ({ ...prev, page: nextPage }) }),
+    [navigate]
+  )
 
-  // Si se elimina el último cliente de la última página, se retrocede a la anterior.
-  useEffect(() => {
-    if (clientes.totalPages > 0 && page > clientes.totalPages) {
-      void navigate({
-        search: (prev) => ({ ...prev, page: clientes.totalPages }),
-        replace: true,
-      })
-    }
-  }, [clientes.totalPages, page, navigate])
+  usePageInRange(page, clientes.totalPages, irAPagina)
 
   return (
     <div className="flex flex-col gap-6 px-4 py-6 lg:px-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-lg font-medium">Clientes</h1>
-          <p className="text-sm text-muted-foreground">
-            Registro de clientes para las solicitudes de crédito.
-          </p>
-        </div>
+      <PageHeader
+        title="Clientes"
+        description="Registro de clientes para las solicitudes de crédito."
+      >
         <Button onClick={() => setFormulario({ open: true })}>
           <PlusIcon />
           Nuevo cliente
         </Button>
-      </div>
+      </PageHeader>
 
       <SearchInput
         className="max-w-sm"
@@ -97,9 +81,7 @@ function ClientesPage() {
 
       <ClientesTable
         clientes={clientes}
-        onPageChange={(nextPage) =>
-          void navigate({ search: (prev) => ({ ...prev, page: nextPage }) })
-        }
+        onPageChange={irAPagina}
         onEditar={editarCliente}
         onEliminar={setClienteAEliminar}
       />

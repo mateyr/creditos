@@ -1,4 +1,3 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -12,14 +11,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { FieldError, FieldGroup } from "@/components/ui/field"
-import {
-  actualizarCliente,
-  clienteSchema,
-  clientesKeys,
-  crearCliente,
-  type Cliente,
-  type ClienteRequest,
-} from "@/features/clientes/api"
+import { useActualizarCliente } from "@/features/clientes/api/actualizar-cliente"
+import { useCrearCliente } from "@/features/clientes/api/crear-cliente"
+import { clienteSchema, type ClienteRequest } from "@/features/clientes/schemas"
+import type { Cliente } from "@/features/clientes/types"
 import { useAppForm } from "@/hooks/use-app-form"
 import { getErrorMessage } from "@/lib/api-client"
 
@@ -72,25 +67,23 @@ function ClienteForm({
   cliente?: Cliente
   onSuccess: () => void
 }) {
-  const queryClient = useQueryClient()
-
-  const guardarMutation = useMutation({
-    mutationFn: async (request: ClienteRequest) => {
-      if (cliente) {
-        await actualizarCliente(cliente.id, request)
-      } else {
-        await crearCliente(request)
-      }
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        // Invalida todas las páginas y búsquedas de la lista.
-        queryKey: clientesKeys.all,
-      })
-      toast.success(cliente ? "Cliente actualizado." : "Cliente registrado.")
-      onSuccess()
+  const crearMutation = useCrearCliente({
+    mutationConfig: {
+      onSuccess: () => {
+        toast.success("Cliente registrado.")
+        onSuccess()
+      },
     },
   })
+  const actualizarMutation = useActualizarCliente({
+    mutationConfig: {
+      onSuccess: () => {
+        toast.success("Cliente actualizado.")
+        onSuccess()
+      },
+    },
+  })
+  const guardarMutation = cliente ? actualizarMutation : crearMutation
 
   const form = useAppForm({
     defaultValues: cliente
@@ -105,11 +98,15 @@ function ClienteForm({
     validators: { onSubmit: clienteSchema },
     onSubmit: async ({ value }) => {
       // parse aplica las normalizaciones del schema (trim) antes de enviar.
-      await guardarMutation
-        .mutateAsync(clienteSchema.parse(value))
-        .catch(() => {
-          // El error se muestra a partir del estado de la mutación.
-        })
+      const request = clienteSchema.parse(value)
+
+      await (
+        cliente
+          ? actualizarMutation.mutateAsync({ id: cliente.id, request })
+          : crearMutation.mutateAsync(request)
+      ).catch(() => {
+        // El error se muestra a partir del estado de la mutación.
+      })
     },
   })
 

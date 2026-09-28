@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router"
 import * as React from "react"
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
+import { NavMain } from "@/components/layout/nav-main"
+import { NavUser } from "@/components/layout/nav-user"
 import {
   Sidebar,
   SidebarContent,
@@ -12,19 +12,30 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { FileTextIcon, HandCoinsIcon, UsersIcon } from "lucide-react"
+import {
+  FileTextIcon,
+  HandCoinsIcon,
+  LandmarkIcon,
+  UsersIcon,
+} from "lucide-react"
 
 const data = {
+  // Orden de uso: primero la cartera de créditos, luego su origen y al final los clientes.
   navMain: [
     {
-      title: "Clientes",
-      url: "/clientes" as const,
-      icon: <UsersIcon />,
+      title: "Créditos",
+      url: "/creditos" as const,
+      icon: <LandmarkIcon />,
     },
     {
       title: "Solicitudes de crédito",
       url: "/solicitudes" as const,
       icon: <FileTextIcon />,
+    },
+    {
+      title: "Clientes",
+      url: "/clientes" as const,
+      icon: <UsersIcon />,
     },
   ],
 }

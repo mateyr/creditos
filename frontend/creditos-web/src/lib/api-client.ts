@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios"
 
-import { session } from "@/features/auth/session"
+import { session } from "@/lib/session"
 
 /** Respuesta de error RFC 7807 que devuelve el backend (ProblemDetails / ValidationProblem). */
 export type ProblemDetails = {

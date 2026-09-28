@@ -1,8 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
 import { z } from "zod"
 
-import { LoginForm } from "@/features/auth/login-form"
-import { session } from "@/features/auth/session"
+import { LoginForm } from "@/features/auth/components/login-form"
+import { session } from "@/lib/session"
 
 const loginSearchSchema = z.object({
   // Solo rutas internas ("/..." pero no "//...") para evitar redirecciones abiertas.

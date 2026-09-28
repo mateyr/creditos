@@ -1,3 +1,4 @@
+using Creditos.Api.Database.Converters;
 using Creditos.Domain.Clientes;
 using Creditos.Domain.Creditos;
 using Creditos.Domain.Solicitudes;
@@ -24,5 +25,11 @@ public sealed class CreditosContext(DbContextOptions<CreditosContext> options)
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CreditosContext).Assembly);
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // Aplica a DateTime y DateTime? de todas las entidades.
+        configurationBuilder.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
     }
 }

@@ -13,7 +13,10 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthClientesRouteImport } from './routes/_auth/clientes'
-import { Route as AuthSolicitudesRouteImport } from './routes/_auth/solicitudes'
+import { Route as AuthCreditosRouteImport } from './routes/_auth/creditos'
+import { Route as AuthSolicitudesIndexRouteImport } from './routes/_auth/solicitudes/index'
+import { Route as AuthSolicitudesSolicitudIdRouteImport } from './routes/_auth/solicitudes/$solicitudId'
+import { Route as AuthSolicitudesNuevaRouteImport } from './routes/_auth/solicitudes/nueva'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
@@ -34,9 +37,25 @@ const AuthClientesRoute = AuthClientesRouteImport.update({
   path: '/clientes',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthSolicitudesRoute = AuthSolicitudesRouteImport.update({
-  id: '/solicitudes',
-  path: '/solicitudes',
+const AuthCreditosRoute = AuthCreditosRouteImport.update({
+  id: '/creditos',
+  path: '/creditos',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSolicitudesIndexRoute = AuthSolicitudesIndexRouteImport.update({
+  id: '/solicitudes/',
+  path: '/solicitudes/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSolicitudesSolicitudIdRoute =
+  AuthSolicitudesSolicitudIdRouteImport.update({
+    id: '/solicitudes/$solicitudId',
+    path: '/solicitudes/$solicitudId',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthSolicitudesNuevaRoute = AuthSolicitudesNuevaRouteImport.update({
+  id: '/solicitudes/nueva',
+  path: '/solicitudes/nueva',
   getParentRoute: () => AuthRoute,
 } as any)
 
@@ -44,34 +63,60 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthIndexRoute
   '/login': typeof LoginRoute
   '/clientes': typeof AuthClientesRoute
-  '/solicitudes': typeof AuthSolicitudesRoute
+  '/creditos': typeof AuthCreditosRoute
+  '/solicitudes/$solicitudId': typeof AuthSolicitudesSolicitudIdRoute
+  '/solicitudes/nueva': typeof AuthSolicitudesNuevaRoute
+  '/solicitudes/': typeof AuthSolicitudesIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/clientes': typeof AuthClientesRoute
-  '/solicitudes': typeof AuthSolicitudesRoute
+  '/creditos': typeof AuthCreditosRoute
   '/': typeof AuthIndexRoute
+  '/solicitudes/$solicitudId': typeof AuthSolicitudesSolicitudIdRoute
+  '/solicitudes/nueva': typeof AuthSolicitudesNuevaRoute
+  '/solicitudes': typeof AuthSolicitudesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/_auth/clientes': typeof AuthClientesRoute
-  '/_auth/solicitudes': typeof AuthSolicitudesRoute
+  '/_auth/creditos': typeof AuthCreditosRoute
   '/_auth/': typeof AuthIndexRoute
+  '/_auth/solicitudes/$solicitudId': typeof AuthSolicitudesSolicitudIdRoute
+  '/_auth/solicitudes/nueva': typeof AuthSolicitudesNuevaRoute
+  '/_auth/solicitudes/': typeof AuthSolicitudesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/clientes' | '/solicitudes'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/clientes'
+    | '/creditos'
+    | '/solicitudes/$solicitudId'
+    | '/solicitudes/nueva'
+    | '/solicitudes/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/clientes' | '/solicitudes' | '/'
+  to:
+    | '/login'
+    | '/clientes'
+    | '/creditos'
+    | '/'
+    | '/solicitudes/$solicitudId'
+    | '/solicitudes/nueva'
+    | '/solicitudes'
   id:
     | '__root__'
     | '/_auth'
     | '/login'
     | '/_auth/clientes'
-    | '/_auth/solicitudes'
+    | '/_auth/creditos'
     | '/_auth/'
+    | '/_auth/solicitudes/$solicitudId'
+    | '/_auth/solicitudes/nueva'
+    | '/_auth/solicitudes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -109,11 +154,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthClientesRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/solicitudes': {
-      id: '/_auth/solicitudes'
+    '/_auth/creditos': {
+      id: '/_auth/creditos'
+      path: '/creditos'
+      fullPath: '/creditos'
+      preLoaderRoute: typeof AuthCreditosRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/solicitudes/': {
+      id: '/_auth/solicitudes/'
       path: '/solicitudes'
-      fullPath: '/solicitudes'
-      preLoaderRoute: typeof AuthSolicitudesRouteImport
+      fullPath: '/solicitudes/'
+      preLoaderRoute: typeof AuthSolicitudesIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/solicitudes/$solicitudId': {
+      id: '/_auth/solicitudes/$solicitudId'
+      path: '/solicitudes/$solicitudId'
+      fullPath: '/solicitudes/$solicitudId'
+      preLoaderRoute: typeof AuthSolicitudesSolicitudIdRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/solicitudes/nueva': {
+      id: '/_auth/solicitudes/nueva'
+      path: '/solicitudes/nueva'
+      fullPath: '/solicitudes/nueva'
+      preLoaderRoute: typeof AuthSolicitudesNuevaRouteImport
       parentRoute: typeof AuthRoute
     }
   }
@@ -121,14 +187,20 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthClientesRoute: typeof AuthClientesRoute
-  AuthSolicitudesRoute: typeof AuthSolicitudesRoute
+  AuthCreditosRoute: typeof AuthCreditosRoute
   AuthIndexRoute: typeof AuthIndexRoute
+  AuthSolicitudesSolicitudIdRoute: typeof AuthSolicitudesSolicitudIdRoute
+  AuthSolicitudesNuevaRoute: typeof AuthSolicitudesNuevaRoute
+  AuthSolicitudesIndexRoute: typeof AuthSolicitudesIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthClientesRoute: AuthClientesRoute,
-  AuthSolicitudesRoute: AuthSolicitudesRoute,
+  AuthCreditosRoute: AuthCreditosRoute,
   AuthIndexRoute: AuthIndexRoute,
+  AuthSolicitudesSolicitudIdRoute: AuthSolicitudesSolicitudIdRoute,
+  AuthSolicitudesNuevaRoute: AuthSolicitudesNuevaRoute,
+  AuthSolicitudesIndexRoute: AuthSolicitudesIndexRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

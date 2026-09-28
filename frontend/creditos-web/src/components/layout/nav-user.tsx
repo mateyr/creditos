@@ -16,7 +16,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { session } from "@/features/auth/session"
+import { session } from "@/lib/session"
 import { EllipsisVerticalIcon, LogOutIcon } from "lucide-react"
 
 export function NavUser({
