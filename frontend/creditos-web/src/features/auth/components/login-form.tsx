@@ -28,7 +28,7 @@ import { useLogin } from "@/features/auth/api/login"
 import { loginSchema, type LoginRequest } from "@/features/auth/schemas"
 import { getErrorMessage } from "@/lib/api-client"
 
-const defaultValues: LoginRequest = { userName: "", password: "" }
+const defaultValues: LoginRequest = { userName: "admin", password: "Admin123*" }
 
 export function LoginForm({
   className,
