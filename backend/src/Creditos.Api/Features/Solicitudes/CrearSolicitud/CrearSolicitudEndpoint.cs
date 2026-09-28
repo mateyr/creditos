@@ -63,7 +63,6 @@ public sealed class CrearSolicitudEndpoint : IEndpoint
             // Se recalcula en el backend: el valor mostrado en el frontend es solo informativo.
             CuotaNivelada = CalculadoraCuotaNivelada.Calcular(
                 request.MontoSolicitado, request.TasaInteresAnual, request.CantidadCuotas, request.Periodicidad),
-            Estado = EstadoSolicitud.Pendiente,
             FechaCreacion = timeProvider.GetUtcNow().UtcDateTime
         };
 
