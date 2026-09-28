@@ -1,13 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/_auth/")({
-  component: HomePage,
+  beforeLoad: () => {
+    throw redirect({ to: "/creditos", replace: true })
+  },
 })
-
-function HomePage() {
-  return (
-    <div className="px-4 py-6 lg:px-6">
-      <h1 className="text-lg font-medium">Inicio</h1>
-    </div>
-  )
-}

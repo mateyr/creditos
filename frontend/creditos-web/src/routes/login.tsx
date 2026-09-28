@@ -17,7 +17,7 @@ export const Route = createFileRoute("/login")({
   validateSearch: loginSearchSchema,
   beforeLoad: ({ search }) => {
     if (session.get()) {
-      throw redirect({ href: search.redirect ?? "/" })
+      throw redirect({ href: search.redirect ?? "/creditos" })
     }
   },
   component: LoginPage,
@@ -31,7 +31,7 @@ function LoginPage() {
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
         <LoginForm
-          onSuccess={() => void navigate({ href: redirectTo ?? "/" })}
+          onSuccess={() => void navigate({ href: redirectTo ?? "/creditos" })}
         />
       </div>
     </div>
