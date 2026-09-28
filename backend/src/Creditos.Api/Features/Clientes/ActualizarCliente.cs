@@ -11,20 +11,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Creditos.Api.Features.Clientes;
 
-public static class CrearCliente
+public static class ActualizarCliente
 {
-    public sealed record Response(int Id);
-
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
-            app.MapPost("clientes", Handle)
+            app.MapPut("clientes/{id:int}", Handle)
                 .WithTags(Tags.Clientes)
                 .RequireAuthorization();
         }
 
-        private static async Task<Results<Created<Response>, ValidationProblem, ProblemHttpResult>> Handle(
+        private static async Task<Results<NoContent, ValidationProblem, ProblemHttpResult>> Handle(
+            int id,
             ClienteRequest request,
             IValidator<ClienteRequest> validator,
             CreditosContext context,
@@ -37,25 +36,27 @@ public static class CrearCliente
                 return TypedResults.ValidationProblem(validationResult.ToDictionary());
             }
 
-            if (await context.Clientes.AnyAsync(c => c.Cedula == request.Cedula, cancellationToken))
+            Cliente? cliente = await context.Clientes.FindAsync([id], cancellationToken);
+
+            if (cliente is null)
+            {
+                return ClienteErrors.NoEncontrado(id);
+            }
+
+            if (await context.Clientes.AnyAsync(c => c.Cedula == request.Cedula && c.Id != id, cancellationToken))
             {
                 return ClienteErrors.CedulaDuplicada(request.Cedula);
             }
 
-            Cliente cliente = new()
-            {
-                Cedula = request.Cedula,
-                NombreCompleto = request.NombreCompleto,
-                CorreoElectronico = request.CorreoElectronico,
-                Telefono = request.Telefono,
-                FechaNacimiento = request.FechaNacimiento
-            };
-
-            context.Clientes.Add(cliente);
+            cliente.Cedula = request.Cedula;
+            cliente.NombreCompleto = request.NombreCompleto;
+            cliente.CorreoElectronico = request.CorreoElectronico;
+            cliente.Telefono = request.Telefono;
+            cliente.FechaNacimiento = request.FechaNacimiento;
 
             await context.SaveChangesAsync(cancellationToken);
 
-            return TypedResults.Created($"/api/clientes/{cliente.Id}", new Response(cliente.Id));
+            return TypedResults.NoContent();
         }
     }
 }

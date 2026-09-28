@@ -503,3 +503,6 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sw?
+
+# Archivos temporales del plugin de TanStack Router
+.tanstack/

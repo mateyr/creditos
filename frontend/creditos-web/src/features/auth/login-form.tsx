@@ -50,7 +50,8 @@ export function LoginForm({
     defaultValues,
     validators: { onSubmit: loginSchema },
     onSubmit: async ({ value }) => {
-      await loginMutation.mutateAsync(value).catch(() => {
+      // parse aplica las normalizaciones del schema (trim) antes de enviar.
+      await loginMutation.mutateAsync(loginSchema.parse(value)).catch(() => {
         // El error se muestra a partir del estado de la mutación.
       })
     },
