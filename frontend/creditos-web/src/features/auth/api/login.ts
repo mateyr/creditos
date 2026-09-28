@@ -4,16 +4,15 @@ import type { LoginRequest } from "@/features/auth/schemas"
 import { apiClient } from "@/lib/api-client"
 import { session } from "@/lib/session"
 
-type LoginResponse = {
-  accessToken: string
-}
-
 export async function login(request: LoginRequest) {
-  const { data } = await apiClient.post<LoginResponse>("/auth/login", request)
+  const { data } = await apiClient.post<{ accessToken: string }>(
+    "/auth/login",
+    request
+  )
   return data
 }
 
-/** Inicia sesión y guarda el token recibido. */
+/** Inicia sesión; el refresh token queda en la cookie httpOnly que envía el backend. */
 export function useLogin({ onSuccess }: { onSuccess?: () => void } = {}) {
   return useMutation({
     mutationFn: login,

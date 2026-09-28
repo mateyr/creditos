@@ -13,8 +13,6 @@ public static class Login
 {
     public sealed record Request(string UserName, string Password);
 
-    public sealed record Response(string AccessToken);
-
     public sealed class Validator : AbstractValidator<Request>
     {
         public Validator()
@@ -33,12 +31,13 @@ public static class Login
                 .AllowAnonymous();
         }
 
-        private static async Task<Results<Ok<Response>, ValidationProblem, ProblemHttpResult>> Handle(
+        private static async Task<Results<Ok<AccessTokenResponse>, ValidationProblem, ProblemHttpResult>> Handle(
             Request request,
             IValidator<Request> validator,
+            HttpResponse response,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            ITokenProvider tokenProvider,
+            AuthTokenService authTokenService,
             CancellationToken cancellationToken)
         {
             ValidationResult validationResult = await validator.ValidateAsync(request, cancellationToken);
@@ -63,7 +62,10 @@ public static class Login
                 return InvalidCredentials();
             }
 
-            return TypedResults.Ok(new Response(tokenProvider.Create(user)));
+            AuthTokens tokens = await authTokenService.IssueAsync(user, cancellationToken);
+            RefreshTokenCookie.Append(response, tokens);
+
+            return TypedResults.Ok(new AccessTokenResponse(tokens.AccessToken));
         }
 
         private static ProblemHttpResult InvalidCredentials() =>

@@ -16,7 +16,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { session } from "@/lib/session"
+import { logout } from "@/features/auth/api/logout"
 import { EllipsisVerticalIcon, LogOutIcon } from "lucide-react"
 
 export function NavUser({
@@ -70,7 +70,7 @@ export function NavUser({
               onClick={() => {
                 // Limpiar la caché evita que el siguiente usuario vea datos del anterior.
                 queryClient.clear()
-                session.clear()
+                void logout()
               }}
             >
               <LogOutIcon />

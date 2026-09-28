@@ -7,13 +7,14 @@ import {
 
 import { AppSidebar } from "@/components/layout/app-sidebar"
 import { SiteHeader } from "@/components/layout/site-header"
-import { session, useSession } from "@/lib/session"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { ensureSession } from "@/lib/api-client"
+import { useSession } from "@/lib/session"
 
 export const Route = createFileRoute("/_auth")({
   // Sin sesión no se entra a ninguna ruta hija; se guarda el destino para volver tras el login.
-  beforeLoad: ({ location }) => {
-    if (!session.get()) {
+  beforeLoad: async ({ location }) => {
+    if (!(await ensureSession())) {
       throw redirect({ to: "/login", search: { redirect: location.href } })
     }
   },

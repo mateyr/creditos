@@ -1,3 +1,4 @@
+using Creditos.Api.Authentication;
 using Creditos.Api.Database.Converters;
 using Creditos.Domain.Clientes;
 using Creditos.Domain.Creditos;
@@ -19,6 +20,8 @@ public sealed class CreditosContext(DbContextOptions<CreditosContext> options)
     public DbSet<Credito> Creditos { get; set; }
 
     public DbSet<CuotaPlanPago> CuotasPlanPago { get; set; }
+
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

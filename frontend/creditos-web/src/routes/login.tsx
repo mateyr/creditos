@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router"
 import { z } from "zod"
 
 import { LoginForm } from "@/features/auth/components/login-form"
-import { session } from "@/lib/session"
+import { ensureSession } from "@/lib/api-client"
 
 const loginSearchSchema = z.object({
   // Solo rutas internas ("/..." pero no "//...") para evitar redirecciones abiertas.
@@ -15,8 +15,8 @@ const loginSearchSchema = z.object({
 
 export const Route = createFileRoute("/login")({
   validateSearch: loginSearchSchema,
-  beforeLoad: ({ search }) => {
-    if (session.get()) {
+  beforeLoad: async ({ search }) => {
+    if (await ensureSession()) {
       throw redirect({ href: search.redirect ?? "/creditos" })
     }
   },

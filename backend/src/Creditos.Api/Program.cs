@@ -57,6 +57,7 @@ builder.Services.AddExceptionHandler<ConcurrencyExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 builder.Services.AddSingleton<ITokenProvider, TokenProvider>();
+builder.Services.AddScoped<AuthTokenService>();
 
 builder.Services.AddSingleton(TimeProvider.System);
 
