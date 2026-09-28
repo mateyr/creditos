@@ -30,5 +30,10 @@ internal sealed class SolicitudCreditoConfiguration : IEntityTypeConfiguration<S
         builder.Property(s => s.CuotaNivelada).HasPrecision(18, 2);
 
         builder.HasIndex(s => s.Estado);
+
+        // Concurrencia optimista: cada UPDATE incluye "WHERE Estado = <leído>". Si otra petición
+        // cambió el estado primero (p. ej. dos desembolsos simultáneos), el segundo falla en lugar
+        // de repetir la operación.
+        builder.Property(s => s.Estado).IsConcurrencyToken();
     }
 }

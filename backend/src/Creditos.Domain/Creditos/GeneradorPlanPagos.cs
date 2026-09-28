@@ -42,6 +42,18 @@ public static class GeneradorPlanPagos
         return plan;
     }
 
+    /// <summary>Recalcula las fechas de vencimiento a partir de una nueva fecha de inicio; los montos no cambian.</summary>
+    public static void ReprogramarVencimientos(
+        IEnumerable<CuotaPlanPago> plan,
+        Periodicidad periodicidad,
+        DateOnly fechaInicio)
+    {
+        foreach (CuotaPlanPago cuota in plan)
+        {
+            cuota.FechaVencimiento = CalcularVencimiento(fechaInicio, cuota.NumeroCuota, periodicidad);
+        }
+    }
+
     private static DateOnly CalcularVencimiento(DateOnly fechaInicio, int numeroCuota, Periodicidad periodicidad) =>
         periodicidad switch
         {

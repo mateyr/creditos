@@ -60,26 +60,8 @@ export type SolicitudDetalle = {
   observaciones: string | null
   fechaCreacion: string
   fechaDictamen: string | null
+  creditoId: number | null
   numeroCredito: string | null
-}
-
-export type CuotaPlanPago = {
-  numeroCuota: number
-  /** Fecha en formato ISO (YYYY-MM-DD). */
-  fechaVencimiento: string
-  cuota: number
-  capital: number
-  interes: number
-  saldo: number
-}
-
-export type PlanPagos = {
-  numeroCredito: string
-  fechaCreacion: string
-  totalCapital: number
-  totalIntereses: number
-  totalPagar: number
-  cuotas: CuotaPlanPago[]
 }
 
 export type SolicitudesParams = {

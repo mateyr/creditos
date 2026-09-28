@@ -13,7 +13,8 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthClientesRouteImport } from './routes/_auth/clientes'
-import { Route as AuthCreditosRouteImport } from './routes/_auth/creditos'
+import { Route as AuthCreditosIndexRouteImport } from './routes/_auth/creditos/index'
+import { Route as AuthCreditosCreditoIdRouteImport } from './routes/_auth/creditos/$creditoId'
 import { Route as AuthSolicitudesIndexRouteImport } from './routes/_auth/solicitudes/index'
 import { Route as AuthSolicitudesSolicitudIdRouteImport } from './routes/_auth/solicitudes/$solicitudId'
 import { Route as AuthSolicitudesNuevaRouteImport } from './routes/_auth/solicitudes/nueva'
@@ -37,9 +38,14 @@ const AuthClientesRoute = AuthClientesRouteImport.update({
   path: '/clientes',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthCreditosRoute = AuthCreditosRouteImport.update({
-  id: '/creditos',
-  path: '/creditos',
+const AuthCreditosIndexRoute = AuthCreditosIndexRouteImport.update({
+  id: '/creditos/',
+  path: '/creditos/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthCreditosCreditoIdRoute = AuthCreditosCreditoIdRouteImport.update({
+  id: '/creditos/$creditoId',
+  path: '/creditos/$creditoId',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthSolicitudesIndexRoute = AuthSolicitudesIndexRouteImport.update({
@@ -63,18 +69,20 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthIndexRoute
   '/login': typeof LoginRoute
   '/clientes': typeof AuthClientesRoute
-  '/creditos': typeof AuthCreditosRoute
+  '/creditos/$creditoId': typeof AuthCreditosCreditoIdRoute
   '/solicitudes/$solicitudId': typeof AuthSolicitudesSolicitudIdRoute
   '/solicitudes/nueva': typeof AuthSolicitudesNuevaRoute
+  '/creditos/': typeof AuthCreditosIndexRoute
   '/solicitudes/': typeof AuthSolicitudesIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/clientes': typeof AuthClientesRoute
-  '/creditos': typeof AuthCreditosRoute
   '/': typeof AuthIndexRoute
+  '/creditos/$creditoId': typeof AuthCreditosCreditoIdRoute
   '/solicitudes/$solicitudId': typeof AuthSolicitudesSolicitudIdRoute
   '/solicitudes/nueva': typeof AuthSolicitudesNuevaRoute
+  '/creditos': typeof AuthCreditosIndexRoute
   '/solicitudes': typeof AuthSolicitudesIndexRoute
 }
 export interface FileRoutesById {
@@ -82,10 +90,11 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/_auth/clientes': typeof AuthClientesRoute
-  '/_auth/creditos': typeof AuthCreditosRoute
   '/_auth/': typeof AuthIndexRoute
+  '/_auth/creditos/$creditoId': typeof AuthCreditosCreditoIdRoute
   '/_auth/solicitudes/$solicitudId': typeof AuthSolicitudesSolicitudIdRoute
   '/_auth/solicitudes/nueva': typeof AuthSolicitudesNuevaRoute
+  '/_auth/creditos/': typeof AuthCreditosIndexRoute
   '/_auth/solicitudes/': typeof AuthSolicitudesIndexRoute
 }
 export interface FileRouteTypes {
@@ -94,28 +103,31 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/clientes'
-    | '/creditos'
+    | '/creditos/$creditoId'
     | '/solicitudes/$solicitudId'
     | '/solicitudes/nueva'
+    | '/creditos/'
     | '/solicitudes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/clientes'
-    | '/creditos'
     | '/'
+    | '/creditos/$creditoId'
     | '/solicitudes/$solicitudId'
     | '/solicitudes/nueva'
+    | '/creditos'
     | '/solicitudes'
   id:
     | '__root__'
     | '/_auth'
     | '/login'
     | '/_auth/clientes'
-    | '/_auth/creditos'
     | '/_auth/'
+    | '/_auth/creditos/$creditoId'
     | '/_auth/solicitudes/$solicitudId'
     | '/_auth/solicitudes/nueva'
+    | '/_auth/creditos/'
     | '/_auth/solicitudes/'
   fileRoutesById: FileRoutesById
 }
@@ -154,11 +166,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthClientesRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/creditos': {
-      id: '/_auth/creditos'
+    '/_auth/creditos/': {
+      id: '/_auth/creditos/'
       path: '/creditos'
-      fullPath: '/creditos'
-      preLoaderRoute: typeof AuthCreditosRouteImport
+      fullPath: '/creditos/'
+      preLoaderRoute: typeof AuthCreditosIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/creditos/$creditoId': {
+      id: '/_auth/creditos/$creditoId'
+      path: '/creditos/$creditoId'
+      fullPath: '/creditos/$creditoId'
+      preLoaderRoute: typeof AuthCreditosCreditoIdRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/solicitudes/': {
@@ -187,19 +206,21 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthClientesRoute: typeof AuthClientesRoute
-  AuthCreditosRoute: typeof AuthCreditosRoute
   AuthIndexRoute: typeof AuthIndexRoute
+  AuthCreditosCreditoIdRoute: typeof AuthCreditosCreditoIdRoute
   AuthSolicitudesSolicitudIdRoute: typeof AuthSolicitudesSolicitudIdRoute
   AuthSolicitudesNuevaRoute: typeof AuthSolicitudesNuevaRoute
+  AuthCreditosIndexRoute: typeof AuthCreditosIndexRoute
   AuthSolicitudesIndexRoute: typeof AuthSolicitudesIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthClientesRoute: AuthClientesRoute,
-  AuthCreditosRoute: AuthCreditosRoute,
   AuthIndexRoute: AuthIndexRoute,
+  AuthCreditosCreditoIdRoute: AuthCreditosCreditoIdRoute,
   AuthSolicitudesSolicitudIdRoute: AuthSolicitudesSolicitudIdRoute,
   AuthSolicitudesNuevaRoute: AuthSolicitudesNuevaRoute,
+  AuthCreditosIndexRoute: AuthCreditosIndexRoute,
   AuthSolicitudesIndexRoute: AuthSolicitudesIndexRoute,
 }
 

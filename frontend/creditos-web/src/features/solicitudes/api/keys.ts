@@ -6,6 +6,4 @@ export const solicitudesKeys = {
   list: (params: SolicitudesParams) =>
     [...solicitudesKeys.all, "list", params] as const,
   detail: (id: number) => [...solicitudesKeys.all, "detail", id] as const,
-  planPagos: (id: number) =>
-    [...solicitudesKeys.all, "plan-pagos", id] as const,
 }

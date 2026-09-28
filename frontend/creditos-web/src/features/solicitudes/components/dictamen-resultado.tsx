@@ -1,13 +1,18 @@
+import { Link } from "@tanstack/react-router"
+import { ArrowRightIcon } from "lucide-react"
+
 import { DetailItem } from "@/components/detail-item"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import type { SolicitudDetalle } from "@/features/solicitudes/types"
 import { EstadoBadge } from "@/features/solicitudes/components/estado-badge"
+import type { SolicitudDetalle } from "@/features/solicitudes/types"
 import { formatDateTime } from "@/lib/format"
 
 /** Dictamen ya emitido por el comité (solicitud aprobada, rechazada o desembolsada). */
@@ -48,6 +53,24 @@ export function DictamenResultado({
           />
         </dl>
       </CardContent>
+      {solicitud.creditoId && (
+        <CardFooter className="border-t">
+          <Button
+            variant="outline"
+            className="w-full"
+            nativeButton={false}
+            render={
+              <Link
+                to="/creditos/$creditoId"
+                params={{ creditoId: solicitud.creditoId }}
+              />
+            }
+          >
+            Ver crédito {solicitud.numeroCredito}
+            <ArrowRightIcon />
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   )
 }

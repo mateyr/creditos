@@ -14,8 +14,8 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { planPagosQueryOptions } from "@/features/solicitudes/api/get-plan-pagos"
-import type { CuotaPlanPago, PlanPagos } from "@/features/solicitudes/types"
+import { planPagosQueryOptions } from "@/features/creditos/api/get-plan-pagos"
+import type { CuotaPlanPago, PlanPagos } from "@/features/creditos/types"
 import { getErrorMessage } from "@/lib/api-client"
 import { formatCurrency, formatDate } from "@/lib/format"
 
@@ -42,13 +42,19 @@ const columns = columnHelper.columns([
   columnHelper.accessor("saldo", moneda("Saldo")),
 ])
 
+type PlanPagosCardProps = {
+  creditoId: number
+  /** Tras el desembolso los vencimientos se cuentan desde esa fecha y ya no cambian. */
+  desembolsado: boolean
+}
+
 /** Tabla de amortización del crédito generada al aprobar la solicitud. */
-export function PlanPagosCard({ solicitudId }: { solicitudId: number }) {
+export function PlanPagosCard({ creditoId, desembolsado }: PlanPagosCardProps) {
   const {
     data: plan,
     error,
     isPending,
-  } = useQuery(planPagosQueryOptions(solicitudId))
+  } = useQuery(planPagosQueryOptions(creditoId))
 
   return (
     <Card>
@@ -56,7 +62,10 @@ export function PlanPagosCard({ solicitudId }: { solicitudId: number }) {
         <CardTitle>Plan de pagos</CardTitle>
         <CardDescription>
           Cuota nivelada: cada cuota paga primero el interés del periodo y el
-          resto amortiza el capital.
+          resto amortiza el capital.{" "}
+          {desembolsado
+            ? "Los vencimientos se cuentan desde la fecha del desembolso."
+            : "Las fechas son estimadas: se recalculan desde el día del desembolso."}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
@@ -78,7 +87,7 @@ function PlanPagosDetalle({ plan }: { plan: PlanPagos }) {
   return (
     <>
       <dl className="grid gap-4 text-sm sm:grid-cols-4">
-        <Total label="Crédito" value={plan.numeroCredito} />
+        <Total label="Cuotas" value={String(plan.cuotas.length)} />
         <Total label="Capital" value={formatCurrency(plan.totalCapital)} />
         <Total label="Intereses" value={formatCurrency(plan.totalIntereses)} />
         <Total label="Total a pagar" value={formatCurrency(plan.totalPagar)} />

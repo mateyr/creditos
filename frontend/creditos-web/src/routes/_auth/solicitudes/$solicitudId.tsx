@@ -10,7 +10,6 @@ import { DatosSolicitud } from "@/features/solicitudes/components/datos-solicitu
 import { DictamenForm } from "@/features/solicitudes/components/dictamen-form"
 import { DictamenResultado } from "@/features/solicitudes/components/dictamen-resultado"
 import { EstadoBadge } from "@/features/solicitudes/components/estado-badge"
-import { PlanPagosCard } from "@/features/solicitudes/components/plan-pagos-card"
 import { getErrorMessage } from "@/lib/api-client"
 import { formatDateTime } from "@/lib/format"
 
@@ -55,8 +54,6 @@ function SolicitudPage() {
           <DictamenResultado solicitud={solicitud} className="lg:col-span-2" />
         )}
       </div>
-
-      {solicitud.numeroCredito && <PlanPagosCard solicitudId={solicitud.id} />}
     </Pagina>
   )
 }

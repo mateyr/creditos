@@ -5,4 +5,6 @@ export const creditosKeys = {
   all: ["creditos"] as const,
   list: (params: CreditosParams) =>
     [...creditosKeys.all, "list", params] as const,
+  detail: (id: number) => [...creditosKeys.all, "detail", id] as const,
+  planPagos: (id: number) => [...creditosKeys.all, "plan-pagos", id] as const,
 }

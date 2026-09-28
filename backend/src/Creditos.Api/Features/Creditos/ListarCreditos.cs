@@ -14,7 +14,11 @@ namespace Creditos.Api.Features.Creditos;
 
 public static class ListarCreditos
 {
-    public sealed record Request(int Page = 1, int PageSize = 10, string? Search = null);
+    public sealed record Request(
+        int Page = 1,
+        int PageSize = 10,
+        string? Search = null,
+        EstadoSolicitud? Estado = null);
 
     public sealed record Response(
         int Id,
@@ -38,6 +42,7 @@ public static class ListarCreditos
             RuleFor(r => r.Page).GreaterThanOrEqualTo(1).WithName("Página");
             RuleFor(r => r.PageSize).InclusiveBetween(1, 100).WithName("Tamaño de página");
             RuleFor(r => r.Search).MaximumLength(150).WithName("Búsqueda");
+            RuleFor(r => r.Estado).IsInEnum().WithMessage("El estado no es válido.");
         }
     }
 
@@ -64,6 +69,12 @@ public static class ListarCreditos
             }
 
             IQueryable<Credito> query = context.Creditos.AsNoTracking();
+
+            // Los créditos están Aprobados (por desembolsar) o Desembolsados.
+            if (request.Estado is not null)
+            {
+                query = query.Where(c => c.Solicitud.Estado == request.Estado);
+            }
 
             if (!string.IsNullOrWhiteSpace(request.Search))
             {

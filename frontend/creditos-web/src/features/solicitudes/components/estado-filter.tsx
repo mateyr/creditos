@@ -12,26 +12,35 @@ import {
 
 const TODOS = "todos"
 
-const opciones = [
-  { value: TODOS, label: "Todos los estados" },
-  ...ESTADOS_SOLICITUD.map((estado) => ({ value: estado, label: estado })),
-]
+type EstadoFilterProps<TEstado extends EstadoSolicitud> = {
+  value: TEstado | undefined
+  onChange: (estado: TEstado | undefined) => void
+  /** Estados que se pueden elegir; por defecto, todos los de una solicitud. */
+  estados?: readonly TEstado[]
+  /** Texto a mostrar por estado, p. ej. "Por desembolsar" en lugar de "Aprobada". */
+  etiquetas?: Partial<Record<TEstado, string>>
+}
 
-export function EstadoFilter({
+export function EstadoFilter<TEstado extends EstadoSolicitud>({
   value,
   onChange,
-}: {
-  value: EstadoSolicitud | undefined
-  onChange: (estado: EstadoSolicitud | undefined) => void
-}) {
+  estados = ESTADOS_SOLICITUD as readonly EstadoSolicitud[] as readonly TEstado[],
+  etiquetas,
+}: EstadoFilterProps<TEstado>) {
+  const opciones = [
+    { value: TODOS, label: "Todos los estados" },
+    ...estados.map((estado) => ({
+      value: estado,
+      label: etiquetas?.[estado] ?? estado,
+    })),
+  ]
+
   return (
     <Select
       items={opciones}
       value={value ?? TODOS}
       onValueChange={(next) =>
-        onChange(
-          next === TODOS || !next ? undefined : (next as EstadoSolicitud)
-        )
+        onChange(next === TODOS || !next ? undefined : (next as TEstado))
       }
     >
       <SelectTrigger className="w-48" aria-label="Filtrar por estado">

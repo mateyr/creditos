@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 
 using Creditos.Api.Authentication;
 using Creditos.Api.Common.Endpoints;
+using Creditos.Api.Common.ExceptionHandlers;
 using Creditos.Api.Common.Extensions;
 using Creditos.Api.Database;
 
@@ -52,6 +53,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddExceptionHandler<ConcurrencyExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddSingleton<ITokenProvider, TokenProvider>();
 
 builder.Services.AddSingleton(TimeProvider.System);
@@ -82,6 +86,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 

@@ -27,6 +27,11 @@ export function formatDate(isoDate: string) {
   return dateFormatter.format(new Date(year, month - 1, day))
 }
 
+/** Solo la fecha (dd/mm/aaaa, en hora local) de una fecha y hora ISO del backend (en UTC). */
+export function formatDateOnly(isoDateTime: string) {
+  return dateFormatter.format(new Date(isoDateTime))
+}
+
 /** Formatea una fecha y hora ISO del backend (en UTC) en la hora local. */
 export function formatDateTime(isoDateTime: string) {
   return dateTimeFormatter.format(new Date(isoDateTime))

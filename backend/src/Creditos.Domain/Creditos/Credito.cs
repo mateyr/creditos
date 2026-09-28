@@ -19,6 +19,25 @@ public sealed class Credito
 
     public List<CuotaPlanPago> PlanPagos { get; set; } = [];
 
+    // Transferencia del desembolso; vacíos mientras el crédito no se haya desembolsado.
+    public Banco? Banco { get; private set; }
+    public string? NumeroCuenta { get; private set; }
+    public DateTime? FechaDesembolso { get; private set; }
+
+    /// <summary>
+    /// Registra la transferencia y reprograma los vencimientos del plan desde la fecha del
+    /// desembolso: los intereses corren desde que el cliente recibe el dinero, no desde la aprobación.
+    /// Se invoca desde <see cref="SolicitudCredito.Desembolsar"/>, que valida el estado.
+    /// </summary>
+    internal void RegistrarDesembolso(Banco banco, string numeroCuenta, DateTime fecha, Periodicidad periodicidad)
+    {
+        Banco = banco;
+        NumeroCuenta = numeroCuenta;
+        FechaDesembolso = fecha;
+
+        GeneradorPlanPagos.ReprogramarVencimientos(PlanPagos, periodicidad, DateOnly.FromDateTime(fecha));
+    }
+
     /// <summary>
     /// Deriva el número incremental del Id generado por la base de datos. Se llama después
     /// de insertar el crédito y dentro de la misma transacción de la aprobación.

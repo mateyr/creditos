@@ -9,10 +9,13 @@ internal sealed class CreditoConfiguration : IEntityTypeConfiguration<Credito>
 {
     public void Configure(EntityTypeBuilder<Credito> builder)
     {
-        builder.ToTable("Creditos");
+        builder.ToTable("Creditos", t =>
+            t.HasCheckConstraint("CK_Creditos_Banco", "\"Banco\" IS NULL OR \"Banco\" IN (1, 2, 3, 4)"));
 
         builder.Property(c => c.NumeroCredito).HasMaxLength(20);
         builder.HasIndex(c => c.NumeroCredito).IsUnique();
+
+        builder.Property(c => c.NumeroCuenta).HasMaxLength(20);
 
         // Una solicitud solo puede generar un crédito: el índice único lo garantiza
         // incluso si dos aprobaciones de la misma solicitud llegan al mismo tiempo.

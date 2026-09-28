@@ -12,9 +12,6 @@ public static class SolicitudErrors
             "Solicitudes.NoPendiente",
             $"Solo se pueden evaluar solicitudes pendientes; esta solicitud está {estado.ToString().ToLowerInvariant()}.");
 
-    public static Error SinCredito(int id) =>
-        Error.NotFound("Solicitudes.SinCredito", $"La solicitud {id} no tiene un crédito aprobado.");
-
     public static readonly Error ObservacionesRequeridas =
         Error.Validation("Solicitudes.ObservacionesRequeridas", "Las observaciones son requeridas para emitir el dictamen.");
 }

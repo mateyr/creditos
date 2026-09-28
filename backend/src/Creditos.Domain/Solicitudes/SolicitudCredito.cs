@@ -72,6 +72,24 @@ public sealed class SolicitudCredito
         return Result.Success();
     }
 
+    /// <summary>
+    /// Transfiere el crédito al cliente. Solo se desembolsan solicitudes aprobadas; el cambio de
+    /// estado, la transferencia y la reprogramación del plan se guardan juntos.
+    /// El crédito debe venir cargado con su plan de pagos.
+    /// </summary>
+    public Result Desembolsar(Banco banco, string numeroCuenta, DateTime fecha)
+    {
+        if (Estado != EstadoSolicitud.Aprobada || Credito is null)
+        {
+            return CreditoErrors.NoAprobado(Estado);
+        }
+
+        Estado = EstadoSolicitud.Desembolsada;
+        Credito.RegistrarDesembolso(banco, numeroCuenta, fecha, Periodicidad);
+
+        return Result.Success();
+    }
+
     // Todo dictamen (aprobación o rechazo) se emite sobre una solicitud pendiente y debe justificarse.
     private Error? ValidarDictamen(string observaciones)
     {

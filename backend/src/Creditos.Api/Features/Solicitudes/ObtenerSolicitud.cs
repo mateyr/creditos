@@ -35,6 +35,7 @@ public static class ObtenerSolicitud
         string? Observaciones,
         DateTime FechaCreacion,
         DateTime? FechaDictamen,
+        int? CreditoId,
         string? NumeroCredito);
 
     public sealed class Endpoint : IEndpoint
@@ -85,6 +86,7 @@ public static class ObtenerSolicitud
                 solicitud.Observaciones,
                 solicitud.FechaCreacion,
                 solicitud.FechaDictamen,
+                solicitud.Credito?.Id,
                 solicitud.Credito?.NumeroCredito));
         }
     }
