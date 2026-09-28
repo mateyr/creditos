@@ -1,3 +1,5 @@
+import { useQueryClient } from "@tanstack/react-query"
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -14,6 +16,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { session } from "@/features/auth/session"
 import { EllipsisVerticalIcon, LogOutIcon } from "lucide-react"
 
 export function NavUser({
@@ -24,6 +27,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const queryClient = useQueryClient()
   const initials = user.name.slice(0, 2).toUpperCase()
 
   return (
@@ -62,7 +66,13 @@ export function NavUser({
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                // Limpiar la caché evita que el siguiente usuario vea datos del anterior.
+                queryClient.clear()
+                session.clear()
+              }}
+            >
               <LogOutIcon />
               Cerrar sesión
             </DropdownMenuItem>

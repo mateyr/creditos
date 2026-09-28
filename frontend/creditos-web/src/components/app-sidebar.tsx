@@ -15,9 +15,6 @@ import {
 import { FileTextIcon, HandCoinsIcon, UsersIcon } from "lucide-react"
 
 const data = {
-  user: {
-    name: "admin",
-  },
   navMain: [
     {
       title: "Clientes",
@@ -31,7 +28,10 @@ const data = {
     },
   ],
 }
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  userName,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { userName: string }) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -50,7 +50,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={{ name: userName }} />
       </SidebarFooter>
     </Sidebar>
   )
