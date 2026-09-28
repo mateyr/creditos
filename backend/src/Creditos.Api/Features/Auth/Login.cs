@@ -4,6 +4,7 @@ using Creditos.Api.Common.Endpoints;
 using FluentValidation;
 using FluentValidation.Results;
 
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
 namespace Creditos.Api.Features.Auth;
@@ -32,7 +33,7 @@ public static class Login
                 .AllowAnonymous();
         }
 
-        private static async Task<IResult> Handle(
+        private static async Task<Results<Ok<Response>, ValidationProblem, ProblemHttpResult>> Handle(
             Request request,
             IValidator<Request> validator,
             UserManager<IdentityUser> userManager,
@@ -44,7 +45,7 @@ public static class Login
 
             if (!validationResult.IsValid)
             {
-                return Results.ValidationProblem(validationResult.ToDictionary());
+                return TypedResults.ValidationProblem(validationResult.ToDictionary());
             }
 
             IdentityUser? user = await userManager.FindByNameAsync(request.UserName);
@@ -62,10 +63,10 @@ public static class Login
                 return InvalidCredentials();
             }
 
-            return Results.Ok(new Response(tokenProvider.Create(user)));
+            return TypedResults.Ok(new Response(tokenProvider.Create(user)));
         }
 
-        private static IResult InvalidCredentials() =>
-            Results.Problem("Usuario o contraseña incorrectos.", statusCode: StatusCodes.Status401Unauthorized);
+        private static ProblemHttpResult InvalidCredentials() =>
+            TypedResults.Problem("Usuario o contraseña incorrectos.", statusCode: StatusCodes.Status401Unauthorized);
     }
 }

@@ -1,5 +1,7 @@
+using System.Globalization;
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 
 using Creditos.Api.Authentication;
 using Creditos.Api.Common.Endpoints;
@@ -51,6 +53,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 builder.Services.AddSingleton<ITokenProvider, TokenProvider>();
+
+builder.Services.AddSingleton(TimeProvider.System);
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+// Mensajes por defecto de FluentValidation en español.
+ValidatorOptions.Global.LanguageManager.Culture = new CultureInfo("es");
 
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
